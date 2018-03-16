@@ -24,6 +24,15 @@
         "masterEndpointDNSNamePrefix": {
             "type": "string",
             "minLength": 1
+        },
+        "computeSize" : {
+          "type" : "int",
+          "defaultValue": 1,
+          "minValue": 1,
+          "maxValue": 30,
+          "metadata": {
+            "description" : "Number of OpenShift compoute nodes to deploy (max 30)"
+          }
         }
     },
     "variables": {},
@@ -428,6 +437,137 @@
                     "script": "{{ Base64 OpenShiftGetNodeSh }}"
                 }
             }
+        },
+        {
+          "name" : "[concat('computeSet', copyindex())]",
+          "type" : "Microsoft.Resources/deployments",
+          "apiVersion" : "2015-01-01",
+          "copy" : {
+            "name" : "computeSet",
+            "count" : "[parameters('computeSize')]"
+          },
+          "properties" : {
+            "mode" : "Incremental",
+            "template": {
+            "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+            "contentVersion": "1.0.0.0",
+            "resources": [
+                {
+                    "name" : "[concat('compute-', copyindex(), '-nsg')]",
+                    "type": "Microsoft.Network/networkSecurityGroups",
+                    "apiVersion": "2017-06-01",
+                    "location": "[resourceGroup().location]",
+                    "properties": {
+                        "securityRules": [
+                            {
+                                "name": "default-allow-ssh",
+                                "properties": {
+                                    "priority": 1000,
+                                    "protocol": "Tcp",
+                                    "access": "Allow",
+                                    "direction": "Inbound",
+                                    "sourceAddressPrefix": "*",
+                                    "sourcePortRange": "*",
+                                    "destinationAddressPrefix": "*",
+                                    "destinationPortRange": "22"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "apiVersion" : "2016-09-01",
+                    "type" : "Microsoft.Network/networkInterfaces",
+                    "name" : "[concat('compute', copyindex(), 'nic')]",
+                    "location" : "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/networkSecurityGroups/', 'compute-', copyindex(), '-nsg')]"
+                    ],
+                    "tags" : {
+                      "displayName" : "NetworkInterface"
+                    },
+                    "properties" : {
+                      "ipConfigurations" : [
+                        {
+                          "name" : "ipconfig",
+                          "properties" : {
+                            "privateIPAllocationMethod" : "Static",
+                            "privateIPAddress": "[concat('10.0.0.', copyindex(12))]",
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/', 'subnet')]"
+                            }
+                          }
+                        }]
+                    }
+                },
+                {
+                    "name": "[concat('compute', copyindex())]",
+                    "type": "Microsoft.Compute/virtualMachines",
+                    "apiVersion": "2017-03-30",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Network/networkInterfaces/', 'compute', copyindex(), 'nic')]"
+                    ],
+                    "properties": {
+                        "osProfile": {
+                            "computerName": "[concat('compute', copyindex())]",
+                            "adminUsername": "cloud-user",
+                            "linuxConfiguration": {
+                                "disablePasswordAuthentication": true,
+                                "ssh": {
+                                    "publicKeys": [
+                                        {
+                                            "path": "/home/cloud-user/.ssh/authorized_keys",
+                                            "keyData": "[parameters('sshRSAPublicKey')]"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "hardwareProfile": {
+                            "vmSize": "[parameters('agentVMSize')]"
+                        },
+                        "storageProfile": {
+                            "imageReference": {
+                                "id": "[resourceId(parameters('imageResourceGroup'), 'Microsoft.Compute/images', parameters('imageName'))]"
+                            },
+                            "osDisk": {
+                                "createOption": "FromImage",
+                                "managedDisk": {
+                                    "storageAccountType": "Premium_LRS"
+                                }
+                            }
+                        },
+                        "networkProfile": {
+                            "networkInterfaces": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('compute', copyindex(), 'nic'))]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "[concat('compute', copyindex(), '/compute-', copyindex(), '-config')]",
+                    "type": "Microsoft.Compute/virtualMachines/extensions",
+                    "location": "[parameters('location')]",
+                    "apiVersion": "2015-06-15",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', 'compute', copyindex())]"
+                    ],
+                    "properties": {
+                        "publisher": "Microsoft.Azure.Extensions",
+                        "type": "CustomScript",
+                        "typeHandlerVersion": "2.0",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {},
+                        "protectedSettings": {
+                            "script": "{{ Base64 OpenShiftGetNodeSh }}"
+                        }
+                    }
+                }
+            ]}
+          }
         }
     ],
     "outputs": {

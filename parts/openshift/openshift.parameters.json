@@ -22,6 +22,9 @@
         },
         "masterEndpointDNSNamePrefix": {
             "value": ""
+        },
+        "computeSize": {
+            "value": "1"
         }
     }
 }

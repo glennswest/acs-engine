@@ -285,6 +285,7 @@ type OpenShiftConfig struct {
 	ImageName          string `json:"imageName,omitempty"`
 	YumCert            string `json:"yumCert,omitempty"`
 	YumKey             string `json:"yumKey,omitempty"`
+	ComputeSize        int    `json:"computeSize,omitempty"`
 }
 
 // MasterProfile represents the definition of the master cluster

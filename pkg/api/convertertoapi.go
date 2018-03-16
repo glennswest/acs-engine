@@ -604,6 +604,7 @@ func convertVLabsOpenShiftConfig(vlabs *vlabs.OpenShiftConfig, api *OpenShiftCon
 	api.ImageName = vlabs.ImageName
 	api.YumCert = vlabs.YumCert
 	api.YumKey = vlabs.YumKey
+	api.ComputeSize = vlabs.ComputeSize
 }
 
 func convertVLabsKubernetesConfig(vlabs *vlabs.KubernetesConfig, api *KubernetesConfig) {
@@ -658,6 +659,9 @@ func setVlabsOpenShiftDefaults(vp *vlabs.Properties, api *OrchestratorProfile) {
 	}
 	if api.OpenShiftConfig.ImageName == "" {
 		api.OpenShiftConfig.ImageName = "rhel7.4_base"
+	}
+	if api.OpenShiftConfig.ComputeSize == 0 {
+		api.OpenShiftConfig.ComputeSize = 1
 	}
 }
 

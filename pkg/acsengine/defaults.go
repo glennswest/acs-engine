@@ -626,6 +626,16 @@ func openShiftSetDefaultCerts(a *api.Properties) (bool, error) {
 		ExternalRouterIP:       net.ParseIP(a.OrchestratorProfile.OpenShiftConfig.RouterIP),
 	}
 
+	startingOctet := 12
+	for i := 0; i < a.OrchestratorProfile.OpenShiftConfig.ComputeSize; i++ {
+		c.Nodes = append(c.Nodes, certgen.Node{
+			Hostname: fmt.Sprintf("compute%d", i),
+			IPs: []net.IP{
+				net.ParseIP(fmt.Sprintf("10.0.0.%d", startingOctet+i)),
+			},
+		})
+	}
+
 	for i, node := range c.Nodes {
 		if node.Master == nil {
 			continue

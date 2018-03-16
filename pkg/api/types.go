@@ -282,6 +282,7 @@ type OpenShiftConfig struct {
 	ImageName          string `json:"imageName,omitempty"`
 	YumCert            string `json:"yumCert,omitempty"`
 	YumKey             string `json:"yumKey,omitempty"`
+	ComputeSize        int    `json:"computeSize,omitempty"`
 
 	ConfigBundles map[string][]byte `json:"-"`
 }
