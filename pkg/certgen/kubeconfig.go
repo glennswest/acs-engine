@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jim-minter/certgen/pkg/filesystem"
+	"github.com/Azure/acs-engine/pkg/filesystem"
 	"gopkg.in/yaml.v2"
 )
 

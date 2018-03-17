@@ -8,8 +8,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/jim-minter/certgen/pkg/certgen/templates"
-	"github.com/jim-minter/certgen/pkg/filesystem"
+	"github.com/Azure/acs-engine/pkg/certgen/templates"
+	"github.com/Azure/acs-engine/pkg/filesystem"
 )
 
 func (c *Config) PrepareMasterFiles(node *Node) error {
