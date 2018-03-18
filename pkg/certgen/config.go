@@ -29,6 +29,7 @@ type Node struct {
 	Hostname string
 	IPs      []net.IP
 	Master   *Master
+	Infra    bool
 	openShiftConfig
 }
 
