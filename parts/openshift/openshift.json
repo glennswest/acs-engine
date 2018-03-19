@@ -476,12 +476,25 @@
                     }
                 },
                 {
+                    "name": "[concat('compute-', copyindex(), '-ip')]",
+                    "type": "Microsoft.Network/publicIPAddresses",
+                    "apiVersion": "2017-08-01",
+                    "location": "[parameters('location')]",
+                    "properties": {
+                        "publicIPAllocationMethod": "Static"
+                    },
+                    "sku": {
+                        "name": "Basic"
+                    }
+                },
+                {
                     "apiVersion" : "2016-09-01",
                     "type" : "Microsoft.Network/networkInterfaces",
                     "name" : "[concat('compute', copyindex(), 'nic')]",
                     "location" : "[resourceGroup().location]",
                     "dependsOn": [
-                        "[concat('Microsoft.Network/networkSecurityGroups/', 'compute-', copyindex(), '-nsg')]"
+                        "[concat('Microsoft.Network/networkSecurityGroups/', 'compute-', copyindex(), '-nsg')]",
+                        "[concat('Microsoft.Network/publicIPAddresses/', 'compute-', copyindex(), '-ip')]"
                     ],
                     "tags" : {
                       "displayName" : "NetworkInterface"
@@ -493,6 +506,9 @@
                           "properties" : {
                             "privateIPAllocationMethod" : "Static",
                             "privateIPAddress": "[concat('10.0.0.', copyindex(12))]",
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat('compute-', copyindex(), '-ip'))]"
+                            },
                             "subnet": {
                                 "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/', 'subnet')]"
                             }
