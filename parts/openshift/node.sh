@@ -296,7 +296,8 @@ ExecStartPre=/usr/bin/cp /etc/origin/node/node-dnsmasq.conf /etc/dnsmasq.d/
 ExecStartPre=/usr/bin/dbus-send --system --dest=uk.org.thekelleys.dnsmasq /uk/org/thekelleys/dnsmasq uk.org.thekelleys.SetDomainServers array:string:/in-addr.arpa/127.0.0.1,/cluster.local/127.0.0.1
 ExecStopPost=/usr/bin/rm /etc/dnsmasq.d/node-dnsmasq.conf
 ExecStopPost=/usr/bin/dbus-send --system --dest=uk.org.thekelleys.dnsmasq /uk/org/thekelleys/dnsmasq uk.org.thekelleys.SetDomainServers array:string:
-ExecStart=/usr/bin/openshift start node  --config=${CONFIG_FILE} $OPTIONS
+#ExecStart=/usr/bin/openshift start node  --config=${CONFIG_FILE} $OPTIONS
+ExecStart=/usr/bin/openshift start node  --bootstrap-config-name=changeme --kubeconfig=/etc/origin/node/node-bootstrap.kubeconfig
 LimitNOFILE=65536
 LimitCORE=infinity
 WorkingDirectory=/var/lib/origin/

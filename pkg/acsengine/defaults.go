@@ -633,10 +633,15 @@ func openShiftSetDefaultCerts(a *api.Properties) (bool, error) {
 		ExternalRouterIP:       net.ParseIP(a.OrchestratorProfile.OpenShiftConfig.RouterIP),
 	}
 
+	var master *certgen.Node = nil
+
 	for i, node := range c.Nodes {
 		if node.Master == nil {
 			continue
+		} else {
+			master = &c.Nodes[i]
 		}
+
 		err := c.PrepareMasterCerts(&c.Nodes[i])
 		if err != nil {
 			return false, err
@@ -657,7 +662,7 @@ func openShiftSetDefaultCerts(a *api.Properties) (bool, error) {
 			return false, err
 		}
 
-		err = c.PrepareNodeKubeConfig(&c.Nodes[i])
+		err = c.PrepareNodeKubeConfig(&c.Nodes[i], master)
 		if err != nil {
 			return false, err
 		}

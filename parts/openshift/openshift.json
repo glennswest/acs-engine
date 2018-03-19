@@ -126,7 +126,7 @@
             "apiVersion": "2017-08-01",
             "location": "[parameters('location')]",
             "properties": {
-                "publicIPAllocationMethod": "Static",
+                "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
                     "domainNameLabel": "[parameters('masterEndpointDNSNamePrefix')]"
                 }
@@ -141,7 +141,7 @@
             "apiVersion": "2017-08-01",
             "location": "[parameters('location')]",
             "properties": {
-                "publicIPAllocationMethod": "Static"
+                "publicIPAllocationMethod": "Dynamic"
             },
             "sku": {
                 "name": "Basic"
@@ -153,7 +153,7 @@
             "apiVersion": "2017-08-01",
             "location": "[parameters('location')]",
             "properties": {
-                "publicIPAllocationMethod": "Static"
+                "publicIPAllocationMethod": "Dynamic"
             },
             "sku": {
                 "name": "Basic"

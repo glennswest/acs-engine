@@ -194,7 +194,7 @@ func (c *Config) PrepareMasterKubeConfigs(node *Node) error {
 	return nil
 }
 
-func (c *Config) PrepareNodeKubeConfig(node *Node) error {
+func (c *Config) PrepareNodeKubeConfig(node *Node, master *Node) error {
 	ep := fmt.Sprintf("%s:%d", c.ExternalMasterHostname, c.Nodes[0].Master.Port)
 	epName := strings.Replace(ep, ".", "-", -1)
 
@@ -207,6 +207,17 @@ func (c *Config) PrepareNodeKubeConfig(node *Node) error {
 		return err
 	}
 	masterclientkey, err := privateKeyAsBytes(node.certs[fmt.Sprintf("system:node:%s", node.Hostname)].key)
+	if err != nil {
+		return err
+	}
+
+	// TODO temporary hack to test this out, the real method should be using a  cert that is generated with
+	// the node-bootstrapper role.
+	admincert, err := certAsBytes(master.Master.certs["admin"].cert)
+	if err != nil {
+		return err
+	}
+	adminkey, err := privateKeyAsBytes(master.Master.certs["admin"].key)
 	if err != nil {
 		return err
 	}
@@ -241,6 +252,39 @@ func (c *Config) PrepareNodeKubeConfig(node *Node) error {
 					User: UserInfo{
 						ClientCertificateData: base64.StdEncoding.EncodeToString(masterclientcert),
 						ClientKeyData:         base64.StdEncoding.EncodeToString(masterclientkey),
+					},
+				},
+			},
+		},
+		"node-bootstrap.kubeconfig": KubeConfig {
+			APIVersion: "v1",
+			Kind:       "Config",
+			Clusters: []Cluster{
+				{
+					Name: epName,
+					Cluster: ClusterInfo{
+						Server: fmt.Sprintf("https://%s", ep),
+						CertificateAuthorityData: base64.StdEncoding.EncodeToString(cacert),
+					},
+				},
+			},
+			Contexts: []Context{
+				{
+					Name: fmt.Sprintf("default/%s/system:admin", epName),
+					Context: ContextInfo{
+						Cluster:   epName,
+						Namespace: "default",
+						User:      fmt.Sprintf("system:admin/%s", epName),
+					},
+				},
+			},
+			CurrentContext: fmt.Sprintf("default/%s/system:admin", epName),
+			Users: []User{
+				{
+					Name: fmt.Sprintf("system:admin/%s", epName),
+					User: UserInfo{
+						ClientCertificateData: base64.StdEncoding.EncodeToString(admincert),
+						ClientKeyData:         base64.StdEncoding.EncodeToString(adminkey),
 					},
 				},
 			},
