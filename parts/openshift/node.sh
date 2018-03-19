@@ -297,7 +297,11 @@ ExecStartPre=/usr/bin/dbus-send --system --dest=uk.org.thekelleys.dnsmasq /uk/or
 ExecStopPost=/usr/bin/rm /etc/dnsmasq.d/node-dnsmasq.conf
 ExecStopPost=/usr/bin/dbus-send --system --dest=uk.org.thekelleys.dnsmasq /uk/org/thekelleys/dnsmasq uk.org.thekelleys.SetDomainServers array:string:
 #ExecStart=/usr/bin/openshift start node  --config=${CONFIG_FILE} $OPTIONS
-ExecStart=/usr/bin/openshift start node  --bootstrap-config-name=changeme --kubeconfig=/etc/origin/node/node-bootstrap.kubeconfig
+{{- if .Infra }}
+ExecStart=/usr/bin/openshift start node  --bootstrap-config-name=infra --kubeconfig=/etc/origin/node/node-bootstrap.kubeconfig
+{{ else }}
+ExecStart=/usr/bin/openshift start node  --bootstrap-config-name=compute --kubeconfig=/etc/origin/node/node-bootstrap.kubeconfig
+{{- end }}
 LimitNOFILE=65536
 LimitCORE=infinity
 WorkingDirectory=/var/lib/origin/

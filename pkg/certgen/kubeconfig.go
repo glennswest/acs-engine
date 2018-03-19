@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Azure/acs-engine/pkg/filesystem"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type KubeConfig struct {
@@ -223,7 +223,7 @@ func (c *Config) PrepareNodeKubeConfig(node *Node, master *Node) error {
 	}
 
 	node.kubeconfigs = map[string]KubeConfig{
-		fmt.Sprintf("system:node:%s.kubeconfig", node.Hostname): KubeConfig{
+		"node.kubeconfig": KubeConfig{
 			APIVersion: "v1",
 			Kind:       "Config",
 			Clusters: []Cluster{
@@ -256,7 +256,7 @@ func (c *Config) PrepareNodeKubeConfig(node *Node, master *Node) error {
 				},
 			},
 		},
-		"node-bootstrap.kubeconfig": KubeConfig {
+		"node-bootstrap.kubeconfig": KubeConfig{
 			APIVersion: "v1",
 			Kind:       "Config",
 			Clusters: []Cluster{

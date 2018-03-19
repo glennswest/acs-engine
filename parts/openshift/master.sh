@@ -463,6 +463,9 @@ while ! oc get svc kubernetes &>/dev/null; do
 	sleep 1
 done
 
+oc create configmap compute --namespace openshift-node --from-file=node-config.yaml=/etc/origin/node/compute-config.yaml
+oc create configmap infra --namespace openshift-node --from-file=node-config.yaml=/etc/origin/node/infra-config.yaml
+
 # TODO: do this, and more (e.g. console), the proper way
 
 oc adm registry --images='registry.reg-aws.openshift.com:443/openshift3/ose-${component}:${version}'
