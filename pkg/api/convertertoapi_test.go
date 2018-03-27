@@ -183,6 +183,8 @@ func TestConvertVLabsOrchestratorProfile(t *testing.T) {
 					OpenShiftConfig: &vlabs.OpenShiftConfig{
 						Location:           "abc",
 						RouterIP:           "def",
+                                                clusterUser:        "xyz",
+                                                clusterPassword:    "mno",
 						ImageResourceGroup: "ghi",
 						ImageName:          "jkl",
 					},
@@ -194,6 +196,8 @@ func TestConvertVLabsOrchestratorProfile(t *testing.T) {
 				OpenShiftConfig: &OpenShiftConfig{
 					Location:           "abc",
 					RouterIP:           "def",
+                                        clusterUser:        "xyz",
+                                        clusterPassword:    "mno",
 					ImageResourceGroup: "ghi",
 					ImageName:          "jkl",
 				},

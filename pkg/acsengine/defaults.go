@@ -617,8 +617,9 @@ func openShiftSetDefaultCerts(a *api.Properties) (bool, error) {
 	}
 
         
-        fmt.Printf("%+v\n",a);
-        //fmt.Printf("%v\n",a.openshiftProfile.clusterUser)
+        //fmt.Printf("%+v\n",a);
+        fmt.Printf("%v\n",a.OrchestratorProfile.OpenShiftConfig.clusterUser)
+        fmt.Printf("%v\n",a.OrchestratorProfile.OpenShiftConfig.clusterPassword)
         //fmt.Printf("%v\n",a.openshiftProfile.clusterPassword)
 	err := c.PrepareMasterCerts()
 	if err != nil {

@@ -56,14 +56,8 @@ type Properties struct {
 	AADProfile              *AADProfile              `json:"aadProfile,omitempty"`
 	CustomProfile           *CustomProfile           `json:"customProfile,omitempty"`
 	HostedMasterProfile     *HostedMasterProfile     `json:"hostedMasterProfile,omitempty"`
-        OpenshiftProfile        *OpenShiftProfile        `json:"openshiftProfile,omitempty"`
 }
 
-// Parameters for Openshift Orchestrator
-type OpenShiftProfile struct {
-        clusterUser        string            `json:"clusterUser,omitempty"`
-        clusterPassword    string            `json:"clusterPassword,omitempty"`
-}
 
 // ServicePrincipalProfile contains the client and secret used by the cluster for Azure Resource CRUD
 type ServicePrincipalProfile struct {
@@ -285,6 +279,8 @@ type DcosConfig struct {
 type OpenShiftConfig struct {
 	Location           string `json:"location,omitempty"`
 	RouterIP           string `json:"routerip,omitempty"`
+        clusterUser        string `json:"clusteruser,omitempty"`
+        clusterPassword    string `json:"clusterpassword,omitempty"`
 	ImageResourceGroup string `json:"imageResourceGroup,omitempty"`
 	ImageName          string `json:"imageName,omitempty"`
 
