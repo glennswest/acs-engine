@@ -616,6 +616,10 @@ func openShiftSetDefaultCerts(a *api.Properties) (bool, error) {
 		ExternalRouterIP:       net.ParseIP(a.OrchestratorProfile.OpenShiftConfig.RouterIP),
 	}
 
+        
+        fmt.Printf("%+v\n",a);
+        //fmt.Printf("%v\n",a.openshiftProfile.clusterUser)
+        //fmt.Printf("%v\n",a.openshiftProfile.clusterPassword)
 	err := c.PrepareMasterCerts()
 	if err != nil {
 		return false, err
