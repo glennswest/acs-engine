@@ -279,8 +279,8 @@ type DcosConfig struct {
 type OpenShiftConfig struct {
 	Location           string `json:"location,omitempty"`
 	RouterIP           string `json:"routerip,omitempty"`
-        clusterUser        string `json:"clusteruser,omitempty"`
-        clusterPassword    string `json:"clusterpassword,omitempty"`
+        ClusterUser        string `json:"clusteruser,omitempty"`
+        ClusterPassword    string `json:"clusterpassword,omitempty"`
 	ImageResourceGroup string `json:"imageResourceGroup,omitempty"`
 	ImageName          string `json:"imageName,omitempty"`
 

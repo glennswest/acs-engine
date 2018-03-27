@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-
+        "github.com/foomo/htpasswd"
 	"github.com/Azure/acs-engine/pkg/api"
 	"github.com/Azure/acs-engine/pkg/api/common"
 	"github.com/Azure/acs-engine/pkg/certgen"
@@ -618,10 +618,18 @@ func openShiftSetDefaultCerts(a *api.Properties) (bool, error) {
 
         
         //fmt.Printf("%+v\n",a);
-        fmt.Printf("%v\n",a.OrchestratorProfile.OpenShiftConfig.clusterUser)
-        fmt.Printf("%v\n",a.OrchestratorProfile.OpenShiftConfig.clusterPassword)
-        //fmt.Printf("%v\n",a.openshiftProfile.clusterPassword)
-	err := c.PrepareMasterCerts()
+        fmt.Printf("in openShiftSetDefaultCerts\n")
+        fmt.Printf("%+v\n",a.OrchestratorProfile.OpenShiftConfig)
+        fmt.Printf("%v\n",a.OrchestratorProfile.OpenShiftConfig.ClusterUser)
+        fmt.Printf("%v\n",a.OrchestratorProfile.OpenShiftConfig.ClusterPassword)
+
+        file := "pkg/certgen/templates/master/etc/origin/master/htpasswd"
+        err := htpasswd.SetPassword(file, a.OrchestratorProfile.OpenShiftConfig.ClusterUser, a.OrchestratorProfile.OpenShiftConfig.ClusterPassword, htpasswd.HashBCrypt)
+	if err != nil {
+		return false, err
+	}
+        
+	err = c.PrepareMasterCerts()
 	if err != nil {
 		return false, err
 	}

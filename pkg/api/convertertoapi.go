@@ -600,6 +600,8 @@ func convertVLabsDcosConfig(vlabs *vlabs.DcosConfig, api *DcosConfig) {
 func convertVLabsOpenShiftConfig(vlabs *vlabs.OpenShiftConfig, api *OpenShiftConfig) {
 	api.Location = vlabs.Location
 	api.RouterIP = vlabs.RouterIP
+        api.ClusterUser = vlabs.ClusterUser
+        api.ClusterPassword = vlabs.ClusterPassword
 	api.ImageResourceGroup = vlabs.ImageResourceGroup
 	api.ImageName = vlabs.ImageName
 }
