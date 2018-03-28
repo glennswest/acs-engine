@@ -7,6 +7,10 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+        "path/filepath"
+        "os"
+        "fmt"
+        "io"
 
 	"github.com/Azure/acs-engine/pkg/certgen/templates"
 	"github.com/Azure/acs-engine/pkg/filesystem"
@@ -57,6 +61,46 @@ func (c *Config) WriteMasterFiles(fs filesystem.Filesystem) error {
 		}
 	}
 
+	return nil
+}
+
+
+func FilePathWalkDir(root string) ([]string, error) {
+    var files []string
+    err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+        if !info.IsDir() {
+            files = append(files, path)
+        }
+        return nil
+    })
+    return files, err
+}
+
+// WriteDynamicMasterFiles writes the run-time created master config
+// Assumed in _output/tmp
+func (c *Config) WriteDynamicMasterFiles(fs filesystem.Filesystem) error {
+        root := "_output/tmp"
+        files, err := FilePathWalkDir(root)
+	for _, name := range files {
+                fmt.Printf("%v\n",name)
+		if !strings.HasPrefix(name, root + "/" +  "master/") {
+			continue
+		}
+
+                fmt.Printf("Reading %v\n",name);
+                b := bytes.NewBuffer(nil);
+                f, _ := os.Open(name)
+                io.Copy(b,f)
+                f.Close()
+                short_name := strings.TrimPrefix(name,root + "/" + "master/")
+                fmt.Printf("%v\n",short_name);
+		err = fs.WriteFile(short_name, b.Bytes(), 0666)
+		if err != nil {
+			return err
+		}
+	}
+
+        fmt.Printf("Success\n")
 	return nil
 }
 

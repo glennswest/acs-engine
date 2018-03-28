@@ -73,6 +73,11 @@ func (c *Config) WriteMaster(fs filesystem.Filesystem) error {
 	if err != nil {
 		return err
 	}
+ 
+	err = c.WriteDynamicMasterFiles(fs)
+	if err != nil {
+		return err
+	}
 
 	return c.WriteNode(fs)
 }

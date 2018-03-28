@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+        "os"
         "github.com/foomo/htpasswd"
 	"github.com/Azure/acs-engine/pkg/api"
 	"github.com/Azure/acs-engine/pkg/api/common"
@@ -623,7 +624,9 @@ func openShiftSetDefaultCerts(a *api.Properties) (bool, error) {
         fmt.Printf("%v\n",a.OrchestratorProfile.OpenShiftConfig.ClusterUser)
         fmt.Printf("%v\n",a.OrchestratorProfile.OpenShiftConfig.ClusterPassword)
 
-        file := "pkg/certgen/templates/master/etc/origin/master/htpasswd"
+        dynamicmasterdir := "_output/tmp/master/etc/origin/master/"
+        os.MkdirAll(dynamicmasterdir,os.ModePerm)
+        file := dynamicmasterdir + "htpasswd"
         err := htpasswd.SetPassword(file, a.OrchestratorProfile.OpenShiftConfig.ClusterUser, a.OrchestratorProfile.OpenShiftConfig.ClusterPassword, htpasswd.HashBCrypt)
 	if err != nil {
 		return false, err
