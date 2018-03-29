@@ -618,13 +618,9 @@ func openShiftSetDefaultCerts(a *api.Properties) (bool, error) {
 	}
 
         
-        //fmt.Printf("%+v\n",a);
-        fmt.Printf("in openShiftSetDefaultCerts\n")
-        fmt.Printf("%+v\n",a.OrchestratorProfile.OpenShiftConfig)
-        fmt.Printf("%v\n",a.OrchestratorProfile.OpenShiftConfig.ClusterUser)
-        fmt.Printf("%v\n",a.OrchestratorProfile.OpenShiftConfig.ClusterPassword)
-
-        dynamicmasterdir := "_output/tmp/master/etc/origin/master/"
+        certgen.SetDeploymentName(a.MasterProfile.DNSPrefix);
+        dynamicdir := "_output/" + a.MasterProfile.DNSPrefix + "/tmp"
+        dynamicmasterdir := dynamicdir + "/master/etc/origin/master/"
         os.MkdirAll(dynamicmasterdir,os.ModePerm)
         file := dynamicmasterdir + "htpasswd"
         err := htpasswd.SetPassword(file, a.OrchestratorProfile.OpenShiftConfig.ClusterUser, a.OrchestratorProfile.OpenShiftConfig.ClusterPassword, htpasswd.HashBCrypt)

@@ -44,6 +44,7 @@ type serial struct {
 	i int64
 }
 
+
 func (s *serial) Get() *big.Int {
 	s.m.Lock()
 	defer s.m.Unlock()
@@ -51,6 +52,7 @@ func (s *serial) Get() *big.Int {
 	s.i++
 	return big.NewInt(s.i)
 }
+
 
 // WriteMaster writes the config files for a Master node to a Filesystem.
 func (c *Config) WriteMaster(fs filesystem.Filesystem) error {
