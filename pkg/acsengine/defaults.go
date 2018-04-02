@@ -272,7 +272,7 @@ func SetPropertiesDefaults(cs *api.ContainerService, isUpgrade bool) (bool, erro
 	setStorageDefaults(properties)
 	setExtensionDefaults(properties)
 
-	certsGenerated, e := setDefaultCerts(properties)
+	certsGenerated, e := setDefaultCerts(properties, cs.Location)
 	if e != nil {
 		return false, e
 	}
@@ -465,7 +465,16 @@ func setOrchestratorDefaults(cs *api.ContainerService) {
 		}
 	case api.OpenShift:
 		a.MasterProfile.Distro = api.RHEL
-		//TODO - what can we reuse from k8s?
+		kc := a.OrchestratorProfile.OpenShiftConfig.KubernetesConfig
+		if kc == nil {
+			kc = &api.KubernetesConfig{}
+		}
+		if kc.ContainerRuntime == "" {
+			kc.ContainerRuntime = DefaultContainerRuntime
+		}
+		if kc.NetworkPolicy == "" {
+			kc.NetworkPolicy = DefaultNetworkPolicy
+		}
 	}
 }
 
@@ -604,18 +613,20 @@ func setStorageDefaults(a *api.Properties) {
 	}
 }
 
-func openShiftSetDefaultCerts(a *api.Properties) (bool, error) {
+func openShiftSetDefaultCerts(a *api.Properties, location string) (bool, error) {
+	externalMasterHostname := fmt.Sprintf("%s.%s.cloudapp.azure.com", a.MasterProfile.DNSPrefix, location)
 	c := certgen.Config{
 		Master: &certgen.Master{
-			Hostname: "master",
+			Hostname: fmt.Sprintf("%s-master-%s-0", DefaultOpenshiftOrchestratorName, GenerateClusterID(a)),
 			IPs: []net.IP{
-				net.ParseIP("10.0.0.11"),
+				net.ParseIP(a.MasterProfile.FirstConsecutiveStaticIP),
 			},
 			Port: 8443,
 		},
-		ExternalMasterHostname: fmt.Sprintf("%s.%s.cloudapp.azure.com", a.MasterProfile.DNSPrefix, a.OrchestratorProfile.OpenShiftConfig.Location),
+		ExternalMasterHostname: externalMasterHostname,
 		ExternalRouterIP:       net.ParseIP(a.OrchestratorProfile.OpenShiftConfig.RouterIP),
 	}
+	a.OrchestratorProfile.OpenShiftConfig.ExternalMasterHostname = externalMasterHostname
 
         
         certgen.SetDeploymentName(a.MasterProfile.DNSPrefix);
@@ -654,7 +665,7 @@ func openShiftSetDefaultCerts(a *api.Properties) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	a.OrchestratorProfile.OpenShiftConfig.ConfigBundles[c.Master.Hostname] = masterBundle
+	a.OrchestratorProfile.OpenShiftConfig.ConfigBundles["master"] = masterBundle
 
 	nodeBundle, err := getConfigBundle(c.WriteNode)
 	if err != nil {
@@ -688,9 +699,9 @@ func getConfigBundle(write writeFn) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func setDefaultCerts(a *api.Properties) (bool, error) {
+func setDefaultCerts(a *api.Properties, location string) (bool, error) {
 	if a.MasterProfile != nil && a.OrchestratorProfile.OrchestratorType == api.OpenShift {
-		return openShiftSetDefaultCerts(a)
+		return openShiftSetDefaultCerts(a, location)
 	}
 
 	if a.MasterProfile == nil || a.OrchestratorProfile.OrchestratorType != api.Kubernetes {
