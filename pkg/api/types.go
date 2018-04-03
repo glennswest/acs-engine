@@ -278,11 +278,11 @@ type DcosConfig struct {
 // OpenShiftConfig holds configuration for OpenShift
 type OpenShiftConfig struct {
 	KubernetesConfig *KubernetesConfig `json:"kubernetesConfig,omitempty"`
-	RouterIP         string            `json:"routerip,omitempty"`
-	ClusterUser        string `json:"clusteruser,omitempty"`
-	ClusterPassword    string `json:"clusterpassword,omitempty"`
 	ConfigBundles          map[string][]byte `json:"-"`
 	ExternalMasterHostname string            `json:"-"`
+	RouterLBHostname       string            `json:"-"`
+	ClusterUser        string `json:"clusteruser,omitempty"`
+	ClusterPassword    string `json:"clusterpassword,omitempty"`
 }
 
 // MasterProfile represents the definition of the master cluster
